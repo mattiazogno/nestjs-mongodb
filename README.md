@@ -5,6 +5,9 @@
 4. creo modulo users e importo lo schema creato nel punto 3
 5. creo service dentro modulo users
 6. creo Dto per createUser
+7. faccio le api rest di patch, delete
+8. Creo user-settings (serve per la One to Many) e lo importo in user.module
+
 
 pnpm i class-validator class-transformer
 

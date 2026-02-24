@@ -7,20 +7,17 @@ import {
   Post,
   Patch,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import mongoose from 'mongoose';
 import { UpdateUserDto } from '../dto/update-user.dto';
+import { UpdateUserSettingsDto } from '../dto/update-setting.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
-
-  @Post()
-  createUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.createUser(createUserDto);
-  }
 
   @Get()
   getUsers() {
@@ -42,6 +39,11 @@ export class UsersController {
     return findUser;
   }
 
+  @Post()
+  createUser(@Body() createUserDto: CreateUserDto) {
+    return this.userService.createUser(createUserDto);
+  }
+
   // update di una parte di documenti
   @Patch(':id')
   async updateUser(@Param('id') id: string, @Body() updateUser: UpdateUserDto) {
@@ -55,6 +57,23 @@ export class UsersController {
       throw new HttpException(`User not exists with: ${id}`, 404);
     }
     return updatedUser;
+  }
+
+  @Put(':id/settings')
+  async putUserSettings(
+    @Param('id') id: string,
+    @Body() updateUserSettings: UpdateUserSettingsDto,
+  ) {
+    const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
+    if (!isValid) {
+      throw new HttpException(`User not valid with: ${id}`, 404);
+    }
+
+    const updatedSettings = await this.userService.updateSettings(id, updateUserSettings);
+    if (!updatedSettings) {
+      throw new HttpException(`User not exists with: ${id}`, 404);
+    }
+    return updatedSettings;
   }
 
   @Delete(':id')
