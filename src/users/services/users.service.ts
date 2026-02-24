@@ -28,4 +28,8 @@ export class UsersService {
       returnDocument: 'after',
     });
   }
+
+  deleteUser(id: string) {
+    return this.userModel.findByIdAndDelete(id);
+  }
 }

@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -43,16 +44,29 @@ export class UsersController {
 
   // update di una parte di documenti
   @Patch(':id')
-  updateUser(@Param('id') id: string, @Body() updateUser: UpdateUserDto) {
+  async updateUser(@Param('id') id: string, @Body() updateUser: UpdateUserDto) {
     const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
     if (!isValid) {
       throw new HttpException(`User not valid with: ${id}`, 404);
     }
 
-    const updatedUser = this.userService.updateUser(id, updateUser);
-    if (!updatedUser){
+    const updatedUser = await this.userService.updateUser(id, updateUser);
+    if (!updatedUser) {
       throw new HttpException(`User not exists with: ${id}`, 404);
     }
     return updatedUser;
+  }
+
+  @Delete(':id')
+  async deleteUser(@Param('id') id: string) {
+    const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
+    if (!isValid) {
+      throw new HttpException(`User not valid with: ${id}`, 404);
+    }
+    const deletedUser = await this.userService.deleteUser(id);
+    if (!deletedUser) {
+      throw new HttpException(`User not exists with: ${id}`, 404);
+    }
+    return deletedUser;
   }
 }
