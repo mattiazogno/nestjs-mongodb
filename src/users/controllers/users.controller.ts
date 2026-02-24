@@ -49,6 +49,10 @@ export class UsersController {
       throw new HttpException(`User not valid with: ${id}`, 404);
     }
 
-    return this.userService.updateUser(id, updateUser);
+    const updatedUser = this.userService.updateUser(id, updateUser);
+    if (!updatedUser){
+      throw new HttpException(`User not exists with: ${id}`, 404);
+    }
+    return updatedUser;
   }
 }
