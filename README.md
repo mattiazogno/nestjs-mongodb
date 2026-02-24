@@ -10,3 +10,4 @@ pnpm i class-validator class-transformer
 
 7. creo Controller User e definisco la creazione dello users
 8.   app.useGlobalPipes(new ValidationPipe()); in main.ts  per imporre che c'è una validazione degli oggetti in ingresso per ogni endpoints
+9. Creo GetAll e GetOne

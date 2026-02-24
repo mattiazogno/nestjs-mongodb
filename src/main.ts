@@ -5,6 +5,8 @@ import { ValidationPipe } from '@nestjs/common';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe()); // ogni endpoint avrà un validation in base al DTO o altro
-  await app.listen(process.env.PORT ?? 3000);
+  const PORT = process.env.PORT ?? 3000;
+  console.log(`Running port: ${PORT}`)
+  await app.listen(PORT);
 }
 bootstrap();

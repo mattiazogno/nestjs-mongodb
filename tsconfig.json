@@ -21,5 +21,17 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-  }
+  },
+  // watchOptions solo per WINDOWS, per LINUX e MAC togliere il blocco
+  "watchOptions": {
+  // polling dinamico: utile su container, WSL, network drives, file system remoti
+  "watchFile": "dynamicPriorityPolling",
+  "watchDirectory": "dynamicPriorityPolling",
+  "excludeDirectories": [
+    "**/node_modules",
+    "**/dist",
+    "**/.git",
+    "**/coverage"
+  ]
+}
 }

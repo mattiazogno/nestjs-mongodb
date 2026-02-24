@@ -1,0 +1,50 @@
+# DEV
+services:
+  nestjs_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dev-nestjs-app
+    
+    env_file:
+        - .env.development
+    ports: 
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+    volumes: 
+      - ./src:/usr/src/app/src # lo faccio per sincronizzare le modifiche in live per il start:dev
+    depends_on:
+          mongo_db:
+            condition: service_healthy
+    networks:
+      - app-network
+  
+  mongo_db:
+    image: mongo:8.0
+    container_name: dev-mongo
+    ports:
+      - "27017:27017"
+    restart: no
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+    name: nestjs-dev-network
+
+volumes:
+  mongo-data:      
