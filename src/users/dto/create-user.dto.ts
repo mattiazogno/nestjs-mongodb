@@ -1,10 +1,16 @@
-import { IsNotEmpty, IsOptional, IsString, ValidateNested } from "class-validator";
-import { CreateUserSettingsDto } from "./create-setting.dto";
-import { Type } from "class-transformer";
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
+import { CreateUserSettingsDto } from './create-setting.dto';
+import { Type } from 'class-transformer';
+import { CreatePostDto } from './create-posts.dto';
 
 export class CreateUserDto {
   @IsNotEmpty()
-  @IsString()  
+  @IsString()
   username!: string;
 
   @IsString()
@@ -13,7 +19,12 @@ export class CreateUserDto {
 
   // ONE TO ONE, embedded
   @IsOptional()
-  @ValidateNested({ each: false })       // ← attiva la validazione ricorsiva (each: false perché non array)
-  @Type(() => CreateUserSettingsDto)     // ← OBBLIGATORIO: dice a class-transformer quale classe usare per l'istanziazione
-  createSettings?:CreateUserSettingsDto ;
+  @Type(() => CreateUserSettingsDto) // ← OBBLIGATORIO: dice a class-transformer quale classe usare per l'istanziazione
+  settings?: CreateUserSettingsDto;
+
+  // ONE TO MANY
+  @IsOptional()
+  @ValidateNested({ each: true }) // ← attiva la validazione ricorsiva
+  @Type(() => CreatePostDto) // ← OBBLIGATORIO: dice a class-transformer quale classe usare per l'istanziazione
+  post?: CreatePostDto[];
 }

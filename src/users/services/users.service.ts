@@ -4,18 +4,11 @@ import { Model } from 'mongoose';
 import { User } from 'src/schemas/user.schema';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { CreateUserSettingsDto } from '../dto/create-setting.dto';
 import { UpdateUserSettingsDto } from '../dto/update-setting.dto';
 
 @Injectable()
 export class UsersService {
-  //
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
-
-  createUser(createUserDto: CreateUserDto) {
-    const newUser = new this.userModel(createUserDto);
-    return newUser.save();
-  }
 
   getUsers() {
     return this.userModel.find();
@@ -25,6 +18,11 @@ export class UsersService {
     return this.userModel.findById(id);
   }
 
+  createUser(createUserDto: CreateUserDto) {
+    const newUser = new this.userModel(createUserDto);
+    return newUser.save();
+  }
+  
   updateUser(id: string, updateUserDto: UpdateUserDto) {
     return this.userModel.findByIdAndUpdate(id, updateUserDto, {
       returnDocument: 'after',
@@ -32,12 +30,11 @@ export class UsersService {
   }
 
   updateSettings(userId: string, settingsDto: UpdateUserSettingsDto) {
-    return this.userModel
-      .findByIdAndUpdate(
-        userId,
-        { $set: { settings: settingsDto } },
-        { returnDocument: 'after', runValidators: true },
-      );
+    return this.userModel.findByIdAndUpdate(
+      userId,
+      { $set: { settings: settingsDto } },
+      { returnDocument: 'after', runValidators: true },
+    );
   }
 
   deleteUser(id: string) {
