@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { UserSettings } from './user-settings.schema';
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
   // unique index
   @Prop({ unique: true, required: true })
@@ -11,7 +11,7 @@ export class User {
   displayName?: string;
 
   @Prop({ required: false })
-  avatartUrl?: string;
+  avatarUrl?: string;
 
   // One to One
   @Prop({ type: UserSettings, default: () => ({}) }) // oppure new UserSettings()

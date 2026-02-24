@@ -34,7 +34,7 @@ export class UsersController {
     const findUser = await this.userService.getUserById(id);
 
     if (!findUser) {
-      throw new HttpException(`User not found: {id}`, 404);
+      throw new HttpException(`User not found: ${id}`, 404);
     }
     return findUser;
   }
@@ -59,7 +59,7 @@ export class UsersController {
     return updatedUser;
   }
 
-  @Put(':id/settings')
+  @Patch(':id/settings')
   async putUserSettings(
     @Param('id') id: string,
     @Body() updateUserSettings: UpdateUserSettingsDto,
