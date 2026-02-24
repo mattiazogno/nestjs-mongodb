@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { UserSettings } from './user-settings.schema';
+import { UserSettings, UserSettingsSchema } from './user-settings.schema';
 
 @Schema({ timestamps: true })
 export class User {
@@ -14,7 +14,7 @@ export class User {
   avatarUrl?: string;
 
   // One to One
-  @Prop({ type: UserSettings, default: () => ({}) }) // oppure new UserSettings()
+  @Prop({ type: UserSettingsSchema, default: () => ({}) })
   settings?: UserSettings;
 }
 

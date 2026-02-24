@@ -1,14 +1,13 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Prop, SchemaFactory } from '@nestjs/mongoose';
 
-@Schema({ _id: false }) // ← importantissimo: evita di creare _id inutili
 export class UserSettings {
-  @Prop({ required: false })
+@Prop({ type: Boolean, default: false })
   receivedNotification?: boolean;
 
-  @Prop({ required: false })
+  @Prop({ type: Boolean, default: false })
   receivedEmail?: boolean;
 
-  @Prop({ required: false })
+  @Prop({ type: Boolean, default: false })
   receivedSMS?: boolean;
 }
 
