@@ -10,16 +10,17 @@ RUN apk add --no-cache dumb-init \
     && corepack prepare pnpm@10 --activate
 
 WORKDIR /usr/src/app
-# copio tutto dato che con il dockerignore ignoro i file non necessari
-COPY . . 
 
-RUN npm install
+# copy sources and install/build
+COPY . .
 
-RUN npm run build
+RUN pnpm install --frozen-lockfile
+RUN pnpm run build
 
-# per avere più spazio tolgo src che non ci serve più siccome usiamo la build
+# remove sources to keep image smaller
 RUN rm -rf ./src
 
-EXPOSE 3001
+EXPOSE 3000
 
-CMD ["pnpm", "run", "start:dev"]
+# run the compiled app
+CMD ["node", "dist/main"]
