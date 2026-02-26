@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, NotFoundException } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, NotFoundException, Query } from '@nestjs/common';
 import { CreateOrderDto } from '../dto/create-order.dto';
 import { UpdateOrderDto } from '../dto/update-order.dto';
 import mongoose from 'mongoose';
 import { OrderService } from '../services/order.service';
+import { CursorPaginationDto } from 'src/common/dto/cursor-pagination.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -14,8 +15,8 @@ export class OrdersController {
   }
 
   @Get()
-  findAll() {
-    return this.ordersService.findAll();
+  findAll(@Query() pagination: CursorPaginationDto) {
+    return this.ordersService.findAll(pagination);
   }
 
   @Get(':id')

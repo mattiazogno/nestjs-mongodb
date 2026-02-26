@@ -12,6 +12,7 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2023",
     "sourceMap": true,
+    "inlineSources": true,
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
@@ -24,14 +25,14 @@
   },
   // watchOptions solo per WINDOWS, per LINUX e MAC togliere il blocco
   "watchOptions": {
-  // polling dinamico: utile su container, WSL, network drives, file system remoti
-  "watchFile": "dynamicPriorityPolling",
-  "watchDirectory": "dynamicPriorityPolling",
-  "excludeDirectories": [
-    "**/node_modules",
-    "**/dist",
-    "**/.git",
-    "**/coverage"
-  ]
-}
+    // polling dinamico: utile su container, WSL, network drives, file system remoti
+    "watchFile": "dynamicPriorityPolling",
+    "watchDirectory": "dynamicPriorityPolling",
+    "excludeDirectories": [
+      "**/node_modules",
+      "**/dist",
+      "**/.git",
+      "**/coverage"
+    ]
+  }
 }
