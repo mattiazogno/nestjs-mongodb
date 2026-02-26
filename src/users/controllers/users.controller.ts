@@ -6,14 +6,14 @@ import {
   Param,
   Post,
   Patch,
-  Delete,
-  Put,
+  Delete
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
 import mongoose from 'mongoose';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateUserSettingsDto } from '../dto/update-setting.dto';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
 
 @Controller('users')
 export class UsersController {
@@ -26,7 +26,7 @@ export class UsersController {
 
   // users/1
   @Get(':id')
-  async getUserById(@Param('id') id: string) {
+  async getUserById(@Param('id', ParseObjectIdPipe) id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
     if (!isValid) {
       throw new HttpException(`User not valid with: ${id}`, 404);
@@ -46,7 +46,7 @@ export class UsersController {
 
   // update di una parte di documenti
   @Patch(':id')
-  async updateUser(@Param('id') id: string, @Body() updateUser: UpdateUserDto) {
+  async updateUser(@Param('id', ParseObjectIdPipe) id: string, @Body() updateUser: UpdateUserDto) {
     const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
     if (!isValid) {
       throw new HttpException(`User not valid with: ${id}`, 404);
@@ -61,7 +61,7 @@ export class UsersController {
 
   @Patch(':id/settings')
   async putUserSettings(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateUserSettings: UpdateUserSettingsDto,
   ) {
     const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
@@ -77,7 +77,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async deleteUser(@Param('id') id: string) {
+  async deleteUser(@Param('id', ParseObjectIdPipe) id: string) {
     const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
     if (!isValid) {
       throw new HttpException(`User not valid with: ${id}`, 404);

@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { validate } from './config/env.validation';
 import { UsersModule } from './users/users.module'; // ← il tuo modulo
 import { OrdersModule } from './orders/orders.module';
+import { MiddlewareMiddleware } from './common/middleware/middleware/middleware.middleware';
 
 @Module({
   imports: [
@@ -34,4 +35,10 @@ import { OrdersModule } from './orders/orders.module';
     OrdersModule,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(MiddlewareMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL });
+  }
+}

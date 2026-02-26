@@ -1,43 +1,43 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User } from 'src/schemas/user.schema';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateUserSettingsDto } from '../dto/update-setting.dto';
+import { UsersRepository } from '../repositories/users.repository';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
   getUsers() {
-    return this.userModel.find().populate('orders');
+    return this.usersRepository.findAll();
   }
 
   getUserById(id: string) {
-    return this.userModel.findById(id).populate('orders');
+    return this.usersRepository.findById(id);
   }
 
   createUser(createUserDto: CreateUserDto) {
-    const newUser = new this.userModel(createUserDto);
-    return newUser.save();
+    return this.usersRepository.create(createUserDto);
   }
 
   updateUser(id: string, updateUserDto: UpdateUserDto) {
-    return this.userModel.findByIdAndUpdate(id, updateUserDto, {
-      returnDocument: 'after',
-    });
+    return this.usersRepository.update(id, updateUserDto);
   }
 
   updateSettings(userId: string, settingsDto: UpdateUserSettingsDto) {
-    return this.userModel.findByIdAndUpdate(
-      userId,
-      { $set: { settings: settingsDto } },
-      { returnDocument: 'after', runValidators: true },
-    );
+    return this.usersRepository.updateSettings(userId, settingsDto);
   }
 
   deleteUser(id: string) {
-    return this.userModel.findByIdAndDelete(id);
+    return this.usersRepository.delete(id);
+  }
+
+  // convenience passthroughs for custom repository queries
+  findByUsername(username: string) {
+    return this.usersRepository.findByUsername(username);
+  }
+
+  getWithOrdersCount(userId: string) {
+    return this.usersRepository.getWithOrdersCount(userId);
   }
 }
