@@ -6,19 +6,21 @@ import {
   Param,
   Post,
   Patch,
-  Delete
+  Delete,
+  UseGuards
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { CreateUserDto } from '../dto/create-user.dto';
-import mongoose from 'mongoose';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { UpdateUserSettingsDto } from '../dto/update-setting.dto';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { AuthGuard } from '../../common/guards/auth/auth.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
 
+  @UseGuards(AuthGuard) // Protegge tutte le rotte di questo controller con AuthGuard
   @Get()
   getUsers() {
     return this.userService.getUsers();
@@ -27,10 +29,6 @@ export class UsersController {
   // users/1
   @Get(':id')
   async getUserById(@Param('id', ParseObjectIdPipe) id: string) {
-    const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
-    if (!isValid) {
-      throw new HttpException(`User not valid with: ${id}`, 404);
-    }
     const findUser = await this.userService.getUserById(id);
 
     if (!findUser) {
@@ -47,10 +45,6 @@ export class UsersController {
   // update di una parte di documenti
   @Patch(':id')
   async updateUser(@Param('id', ParseObjectIdPipe) id: string, @Body() updateUser: UpdateUserDto) {
-    const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
-    if (!isValid) {
-      throw new HttpException(`User not valid with: ${id}`, 404);
-    }
 
     const updatedUser = await this.userService.updateUser(id, updateUser);
     if (!updatedUser) {
@@ -64,10 +58,6 @@ export class UsersController {
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateUserSettings: UpdateUserSettingsDto,
   ) {
-    const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
-    if (!isValid) {
-      throw new HttpException(`User not valid with: ${id}`, 404);
-    }
 
     const updatedSettings = await this.userService.updateSettings(id, updateUserSettings);
     if (!updatedSettings) {
@@ -78,10 +68,6 @@ export class UsersController {
 
   @Delete(':id')
   async deleteUser(@Param('id', ParseObjectIdPipe) id: string) {
-    const isValid = mongoose.Types.ObjectId.isValid(id); // valido ID, si potrebbe fare nel middleware
-    if (!isValid) {
-      throw new HttpException(`User not valid with: ${id}`, 404);
-    }
     const deletedUser = await this.userService.deleteUser(id);
     if (!deletedUser) {
       throw new HttpException(`User not exists with: ${id}`, 404);

@@ -1,13 +1,21 @@
-import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import {
+  Module,
+  NestModule,
+  MiddlewareConsumer,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { validate } from './config/env.validation';
 import { UsersModule } from './users/users.module'; // ← il tuo modulo
 import { OrdersModule } from './orders/orders.module';
-import { MiddlewareMiddleware } from './common/middleware/middleware/middleware.middleware';
+import { HttpExceptionFilter } from './common/filter/http-exception.filter';
+import { APP_FILTER } from '@nestjs/core';
+import { RequestContextMiddleware } from './common/middleware/request-context.middleware';
 
 @Module({
   imports: [
+    // ConfigModule con validazione e supporto per più ambienti
     ConfigModule.forRoot({
       isGlobal: true, // ConfigService accessibile ovunque senza import
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`, // fallback intelligente
@@ -34,11 +42,19 @@ import { MiddlewareMiddleware } from './common/middleware/middleware/middleware.
     UsersModule,
     OrdersModule,
   ],
+  providers: [
+    // Registrazione globale del filtro per gestire eccezioni HTTP in modo uniforme
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
+    },
+  ],
 })
+// AppModule ora implementa NestModule per configurare il middleware
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(MiddlewareMiddleware)
+      .apply(RequestContextMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.ALL });
   }
 }

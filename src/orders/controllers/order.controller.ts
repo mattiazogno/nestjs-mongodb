@@ -22,7 +22,6 @@ export class OrdersController {
 
   @Get(':id')
   async findOne(@Param('id', ParseObjectIdPipe) id: string) {
-    if (!mongoose.Types.ObjectId.isValid(id)) throw new NotFoundException('Invalid ID');
     const order = await this.ordersService.findById(id);
     if (!order) throw new NotFoundException('Order not found');
     return order;
