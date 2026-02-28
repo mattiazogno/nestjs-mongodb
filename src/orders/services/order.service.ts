@@ -16,41 +16,92 @@ export class OrderService {
     private readonly userService: UsersService,
   ) {}
 
-  // order.service.ts
   async create(createOrderDto: CreateOrderDto) {
-    // 1. Verifica esistenza (opzionale ma buona pratica)
     const existUser = await this.userService.getUserById(createOrderDto.user);
     if (!existUser) {
       throw new NotFoundException('User not found');
     }
-
-    // 2. create accetta direttamente il DTO perché user è string
     return this.ordersRepository.create(createOrderDto);
   }
 
   async findAll(pagination?: CursorPaginationDto) {
-    return this.ordersRepository.findAll(pagination);
+    const { cursor, limit = 10 } = pagination ?? {};
+
+    // Validazione applicativa del cursor
+    if (cursor) {
+      const date = new Date(cursor);
+      if (Number.isNaN(date.getTime())) {
+        throw new BadRequestException('Cursor non è una data ISO valida');
+      }
+    }
+
+    // Costruzione filtro
+    const filter: Record<string, any> = {};
+    if (cursor) filter.createdAt = { $lt: new Date(cursor) };
+
+    // Fetch limit+1 per determinare hasMore
+    const docs = await this.ordersRepository.findAllFromCursor(filter, limit + 1);
+
+    // Logica di paginazione
+    const hasMore = docs.length > limit;
+    const results = hasMore ? docs.slice(0, limit) : docs;
+    const nextCursor =
+      results.length > 0
+        ? (results[results.length - 1] as any).createdAt.toISOString()
+        : null;
+
+    return { data: results, pageInfo: { hasMore, nextCursor } };
   }
 
-  findById(id: string) {
-    return this.ordersRepository.findById(id);
+  async findById(id: string) {
+    const order = await this.ordersRepository.findById(id);
+    if (!order) {
+      throw new NotFoundException(`Ordine con id ${id} non trovato`);
+    }
+    return order;
   }
 
-  findByUser(userId: string) {
+  async findByUser(userId: string) {
+    // Verifica che l'utente esista prima di cercare i suoi ordini
+    const existUser = await this.userService.getUserById(userId);
+    if (!existUser) {
+      throw new NotFoundException('User not found');
+    }
     return this.ordersRepository.findByUser(userId);
   }
 
-  update(id: string, updateOrderDto: UpdateOrderDto) {
+  async update(id: string, updateOrderDto: UpdateOrderDto) {
     if ('user' in updateOrderDto) {
-      throw new BadRequestException(
-        "Non si può modificare id utente dell'Ordine",
-      );
+      throw new BadRequestException("Non si può modificare l'utente di un ordine");
     }
-
-    return this.ordersRepository.update(id, updateOrderDto);
+    const updated = await this.ordersRepository.update(id, updateOrderDto);
+    if (!updated) {
+      throw new NotFoundException(`Ordine con id ${id} non trovato`);
+    }
+    return updated;
   }
 
-  delete(id: string) {
-    return this.ordersRepository.delete(id);
+  async delete(id: string) {
+    const deleted = await this.ordersRepository.delete(id);
+    if (!deleted) {
+      throw new NotFoundException(`Ordine con id ${id} non trovato`);
+    }
+    return deleted;
+  }
+
+  async findRecentByUser(userId: string, limit = 5) {
+    const existUser = await this.userService.getUserById(userId);
+    if (!existUser) {
+      throw new NotFoundException('User not found');
+    }
+    return this.ordersRepository.findRecentByUser(userId, limit);
+  }
+
+  async aggregateTotalsByUser(userId: string) {
+    const existUser = await this.userService.getUserById(userId);
+    if (!existUser) {
+      throw new NotFoundException('User not found');
+    }
+    return this.ordersRepository.aggregateTotalsByUser(userId);
   }
 }
