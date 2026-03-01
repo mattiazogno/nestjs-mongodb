@@ -18,7 +18,7 @@ import { RequestContextMiddleware } from './common/middleware/request-context.mi
     // ConfigModule con validazione e supporto per più ambienti
     ConfigModule.forRoot({
       isGlobal: true, // ConfigService accessibile ovunque senza import
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`, // fallback intelligente
+      envFilePath: `.env`, 
       validate, // fail-fast se manca qualcosa o è invalido
       cache: true, // performance (da v3+)
       expandVariables: true, // supporta ${VAR} dentro .env (utile)

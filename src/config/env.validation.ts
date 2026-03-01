@@ -1,16 +1,8 @@
 import { plainToInstance } from 'class-transformer';
 import { IsEnum, IsNumber, IsString, validateSync } from 'class-validator';
 
-enum Environment {
-  Development = 'development',
-  Production  = 'production',
-  Test        = 'test',
-}
 
 class EnvironmentVariables {
-  @IsEnum(Environment)
-  NODE_ENV: Environment = Environment.Development;
-
   @IsNumber()
   PORT: number = 3000;
 

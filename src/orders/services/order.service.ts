@@ -19,7 +19,7 @@ export class OrderService {
   async create(createOrderDto: CreateOrderDto) {
     const existUser = await this.userService.getUserById(createOrderDto.user);
     if (!existUser) {
-      throw new NotFoundException('User not found');
+      throw new BadRequestException('User not found');
     }
     return this.ordersRepository.create(createOrderDto);
   }

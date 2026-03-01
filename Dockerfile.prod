@@ -1,5 +1,4 @@
 FROM node:24-alpine AS base
-
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
@@ -11,16 +10,19 @@ RUN apk add --no-cache dumb-init \
 
 WORKDIR /usr/src/app
 
-# copy sources and install/build
-COPY . .
+# Copia prima solo i file delle dipendenze (layer cachabile)
+COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile
+
+# Poi copia il resto del codice
+COPY . .
+
 RUN pnpm run build
 
-# remove sources to keep image smaller
-RUN rm -rf ./src
+# Rimuovi src e node_modules dev dopo la build
+RUN rm -rf ./src && pnpm prune --prod
 
 EXPOSE 3000
 
-# run the compiled app
-CMD ["node", "dist/main"]
+CMD ["dumb-init", "node", "dist/main"]
